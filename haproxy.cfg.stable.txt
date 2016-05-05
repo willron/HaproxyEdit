@@ -1,0 +1,57 @@
+global
+	log	127.0.0.1	local0	debug
+	log	127.0.0.1	local1	notice
+	maxconn	40960
+	chroot	/usr/share/haproxy
+	uid	99
+	gid	99
+	daemon
+	nbproc	4
+	pidfile	/var/run/haproxy.pid
+
+defaults
+	log	global
+	mode	http
+	option	httplog
+	option	httpclose
+	option	dontlognull
+	option	forwardfor
+	option	abortonclose
+	stats	refresh	30
+	balance	roundrobin
+	retries	3
+	option	redispatch
+	maxconn	40960
+	contimeout	50000
+	clitimeout	50000
+	srvtimeout	50000
+	timeout	check	20000
+
+listen	admin_status
+	bind	:65532
+	mode	http
+	stats	refresh	5s
+	stats	uri	/admin?stats
+	stats	realm	Haproxy\	Statistics
+	stats	auth	hk:redhat
+	stats	hide-version
+	stats	admin	if	TRUE
+
+listen	site_status
+	bind	:65533
+	mode	http
+	monitor-uri	/site_status
+	capture	request	header	Host		len	40
+	capture	request	header	Content-Length	len	10
+	capture	request	header	Referer		len	200
+	capture	response	header	Server		len	40
+	capture	response	header	Content-Length	len	10
+	capture	response	header	Cache-Control	len	8
+
+frontend	https_frontend
+	bind	*:80
+	bind	*:443	ssl	crt	/keys/geotrust/server.pem
+	mode	http
+	option	httpclose
+	option	forwardfor
+	reqadd	X-Forwarded-Proto:\	https

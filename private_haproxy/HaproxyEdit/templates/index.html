@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    {% load static %}
+    <link href="{% static "css/bootstrap-combined.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/define.css" %}" rel="stylesheet">
+</head>
+<body>
+
+    <form method="post" id="data_post">
+
+        <div>
+            <table id="tab" class="tab">
+                <thead  bgcolor="#808080">
+                    <tr>
+                        <th>ACL</th>
+                    </tr>
+                    <tr>
+                        <th width="10">编号</th>
+                        <th>ACL名称</th>
+                        <th>检测方式</th>
+                        <th>条件定义</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in acl %}
+                    <tr>
+{#                        <td><input type="text" value="{{ i.0 }}" name="acl_id" readonly="readonly"></td>#}
+                        <td name="acl_id" id="{{ i.0 }}">{{ i.0 }}</td>
+
+                        <td><input type="text" value="{{ i.1 }}" name="acl_{{ i.0 }}_acl_name" class="acl_acl_name" required="required"></td>
+{#                        <td><input type="text" value="{{ i.2 }}" name="acl_{{ i.0 }}_mode" required="required"></td>#}
+                        <td>
+                            <select name="acl_{{ i.0 }}_mode" id="modeSelect" data-placeholder="选择一种">
+                                <option value="hdr(host)" {% if i.2 == "hdr(host)" %}selected{% endif %}>hdr(host)</option>
+                                <option value="hdr_reg(host)" {% if i.2 == "hdr_reg(host)" %}selected{% endif %}>hdr_reg(host)</option>
+                                <option value="hdr_beg(RequestType)" {% if i.2 == "hdr_beg(RequestType)" %}selected{% endif %}>hdr_beg(RequestType)</option>
+                                <option value="hdr(RequestType)" {% if i.2 == "hdr(RequestType)" %}selected{% endif %}>hdr(RequestType)</option>
+                                <option value="path_beg" {% if i.2 == "path_beg" %}selected{% endif %}>path_beg</option><option value="path_end">path_end</option>
+                            </select>
+                        </td>
+
+                        <td><input type="text" value="{{ i.3 }}" name="acl_{{ i.0 }}_defined" required="required"></td>
+
+                        <td><input type="button" value="删除" name="acl_delete" class="acl_delete"/></td>
+                    </tr>
+                {% endfor %}
+                    <tr>
+{#                        <td>{{ i.0 }}</td>#}
+                        <td><input type="button" value="add" id="acl_add" name="acl_add"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            </br>
+
+            <table id="tab2" class="tab2">
+                <thead  bgcolor="#808080">
+                    <tr>
+                        <th>ACTION</th>
+                    </tr>
+                    <tr>
+                        <th>编号</th>
+                        <th>后端集群</th>
+                        <th>对应ACL</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in action %}
+                    <tr>
+                        <td name="action_id" id="{{ i.0 }}">{{ i.0 }}</td>
+
+                        <td><input type="text" value="{{ i.1 }}" name="action_{{ i.0 }}_backend_name" class="action_backend_name" required="required"></td>
+                        <td><input type="text" value="{{ i.2 }}" name="action_{{ i.0 }}_acl_name" required="required"></td>
+
+                        <td><input type="button" value="删除" name="action_delete" class="action_delete"/></td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+{#                        <td>{{ i.0 }}</td>#}
+                        <td><input type="button" value="add" id="action_add" name="action_add"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            </br>
+
+            <table id="tab3" class="tab3">
+                <thead  bgcolor="#808080">
+                    <tr>
+                        <th>BACKEND_SERVER</th>
+                    </tr>
+                    <tr>
+                        <th>编号</th>
+                        <th>集群名</th>
+                        <th>服务器名称</th>
+                        <th>服务器地址</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in backend %}
+                    <tr>
+                        <td name="backend_id" id="{{ i.0 }}">{{ i.0 }}</td>
+
+                        <td><input type="text" value="{{ i.1 }}" name="backend_{{ i.0 }}_backend_name" class="backend_backend_name" required="required"></td>
+                        <td><input type="text" value="{{ i.2 }}" name="backend_{{ i.0 }}_server0_name" required="required"></td>
+                        <td><input type="text" value="{{ i.3 }}:{{ i.4 }}" name="backend_{{ i.0 }}_server0_address" required="required" pattern="^\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}$" placeholder="IP:端口"></td>
+
+                        {#						<td><input type="text" value="{{ i.5 }}" name="server1_name"></td>#}
+                        {#                        <td><input type="text" value="{{ i.6 }}:{{ i.7 }}" name="server1_address"></td>#}
+                        <td><input type="button" value="删除" name="backend_delete" class="backend_delete"/></td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+{#                        <td>{{ i.0 }}</td>#}
+                        <td><input type="button" value="add" id="backend_add" name="backend_add"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            </br>
+
+{#            <input type="button" value="提交" id="check_submit"/>#}
+        <input type="submit" value="提交" id="check_submit"/>
+
+        </div>
+    </form>
+</body>
+</html>
+<script type="application/javascript" src="{% static "css/jquery.js" %}"></script>
+<script type="application/javascript" src="{% static "css/define.js" %}"></script>
