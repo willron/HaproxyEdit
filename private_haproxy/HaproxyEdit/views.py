@@ -6,7 +6,7 @@ by:willron
 __author__ = 'zxp'
 
 
-import os
+import time
 import shutil
 import commands
 from django.shortcuts import render
@@ -16,8 +16,10 @@ from models import ACL, ACTION, BACKEND_SERVER
 
 
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'
-haproxycfg_stable = 'haproxy.cfg.stable.txt'
+# haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
+haproxycfg_stable = 'haproxy.cfg.stable.txt'        # 公司电脑
+haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
+
 
 reload_haproxy_cmd = 'ls ~'
 
@@ -196,7 +198,7 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
         # haproxy重启成功，将数据写入数据库
 
         # 处理ACL
-
+        #     start = time.time()
             # 删除数据
             all_old_id_acl = [i['id'] for i in ACL.objects.all().values('id')]
             del_id_acl = set(all_old_id_acl) - set(data_acl_id)
@@ -208,7 +210,10 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
             for each_acl_sql in acl_sql:
                 sql_acl_id = each_acl_sql['id']
                 each_acl_sql.pop('id')
-                obj, create = ACL.objects.update_or_create(id=sql_acl_id, defaults=each_acl_sql)
+                try:
+                    exists = ACL.objects.get(id=sql_acl_id, mode=each_acl_sql['mode'], acl_name=each_acl_sql['acl_name'], defined=each_acl_sql['defined'])
+                except ACL.DoesNotExist, e:
+                    obj, create = ACL.objects.update_or_create(id=sql_acl_id, defaults=each_acl_sql)
                 # print obj.__dict__
                 # print create
 
@@ -223,7 +228,13 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
             for each_backend_sql in backend_sql:
                 sql_backend_id = each_backend_sql['id']
                 each_backend_sql.pop('id')
-                obj, create = BACKEND_SERVER.objects.update_or_create(id=sql_backend_id, defaults=each_backend_sql)
+                try:
+                    exists = BACKEND_SERVER.objects.get(id=sql_backend_id, backend_name=each_backend_sql['backend_name'],
+                                                        server0_name=each_backend_sql['server0_name'],
+                                                        server0_ip=each_backend_sql['server0_ip'],
+                                                        server0_port=each_backend_sql['server0_port'])
+                except BACKEND_SERVER.DoesNotExist, e:
+                    obj, create = BACKEND_SERVER.objects.update_or_create(id=sql_backend_id, defaults=each_backend_sql)
                 # print obj.__dict__
                 # print create
 
@@ -239,8 +250,14 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
             for each_action_sql in action_sql:
                 sql_action_id = each_action_sql['id']
                 each_action_sql.pop('id')
-                obj, create = ACTION.objects.update_or_create(id=sql_action_id, defaults=each_action_sql)
+                try:
+                    exists = ACTION.objects.get(id=sql_action_id, acl_name=each_action_sql['acl_name'],
+                                                backend_name=each_action_sql['backend_name'])
+                except ACTION.DoesNotExist, e:
+                    obj, create = ACTION.objects.update_or_create(id=sql_action_id, defaults=each_action_sql)
                 # print obj.__dict__
                 # print create
+            #     end = time.time()
+            # print end-start
 
         return HttpResponse('POST')
