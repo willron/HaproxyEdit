@@ -6,11 +6,13 @@
 </head>
 <body>
 
-<span>保存成功!</span>
+<span>保存成功!等待跳转</span>
 
-<script language="javascript" type="">
-    var HostnameAndIP = window.location.host
-    window.location.href="";
+<script language="javascript">
+    setTimeout(redirect,2000);
+    function redirect(){
+        window.location.href="";
+    };
 </script>
 
 </body>
