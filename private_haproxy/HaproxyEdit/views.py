@@ -182,7 +182,7 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
         with open(haproxycfg_stable_front, 'r') as cfg_stable:
             # 写入固定数据
             f.write(cfg_stable.read())
-            f.write('\n{}\n\n'.format('#'*80))
+            # f.write('\n{}\n\n'.format('#'*80))
 
         f.writelines(data_acl)      # 写入ACL
         f.write('\n{}\n\n'.format('#'*80))
