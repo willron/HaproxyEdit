@@ -9,24 +9,22 @@ __author__ = 'zxp'
 import time
 import shutil
 import commands
-from django.shortcuts import render
+from django.shortcuts import render,render_to_response
 from django.http import HttpResponse
 from models import ACL, ACTION, BACKEND_SERVER
 
 
-
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 开发环境
 haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
 # haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
+reload_haproxy_cmd = 'ls ~'
+
+# 正式环境
+# haproxycfg_path = '/usr/local/haproxy/etc/haproxy.cfg'
+# reload_haproxy_cmd = '/etc/init.d/haproxy reload'
 
 haproxycfg_stable_front = 'haproxy.cfg.stable.front.txt'        # 公司电脑
 haproxycfg_stable_end = 'haproxy.cfg.stable.end.txt'
-
-
-
-
-
-reload_haproxy_cmd = 'ls ~'
 
 def index(request):
     if request.method == 'GET':
@@ -271,4 +269,5 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
             #     end = time.time()
             # print end-start
 
-        return HttpResponse('POST')
+        # return HttpResponse('POST')
+        return render(request, 'result.html')
