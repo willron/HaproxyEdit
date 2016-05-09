@@ -1,0 +1,9 @@
+
+########↓↓↓↓↓↓↓↓↓↓↓↓↓stable_front↓↓↓↓↓↓↓↓↓↓↓↓↓########
+
+backend haproxyedit_server
+    balance roundrobin
+    option  httpclose
+    option  forwardfor
+    cookie  SERVERID insert indirect nocache
+    server  haproxyedit_server_local  127.0.0.1:8000  check  inter	1500  rise 3  fall 3  weight 1

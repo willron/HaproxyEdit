@@ -16,9 +16,14 @@ from models import ACL, ACTION, BACKEND_SERVER
 
 
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
-haproxycfg_stable = 'haproxy.cfg.stable.txt'        # 公司电脑
-haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
+haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
+# haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
+
+haproxycfg_stable_front = 'haproxy.cfg.stable.front.txt'        # 公司电脑
+haproxycfg_stable_end = 'haproxy.cfg.stable.end.txt'
+
+
+
 
 
 reload_haproxy_cmd = 'ls ~'
@@ -176,16 +181,22 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
         f = open('haproxy.cfg', 'w')
 
         # 文件写入
-        with open(haproxycfg_stable, 'r') as cfg_stable:
+        with open(haproxycfg_stable_front, 'r') as cfg_stable:
             # 写入固定数据
             f.write(cfg_stable.read())
             f.write('\n{}\n\n'.format('#'*80))
+
         f.writelines(data_acl)      # 写入ACL
         f.write('\n{}\n\n'.format('#'*80))
         f.writelines(data_action)     # 写入ACTION
         f.write('\n{}\n\n'.format('#'*80))
         f.writelines(data_backend)      # 写入BACKEND
-        f.write('\n{}\n\n'.format('#'*80))
+
+        with open(haproxycfg_stable_end, 'r') as cfg_stable:
+            # 写入文件尾部固定数据
+            f.write(cfg_stable.read())
+            f.write('\n{}\n\n'.format('#'*80))
+
         f.close()
 
         shutil.copyfile('haproxy.cfg', haproxycfg_path)     # 复制新的配置文件到haproxy文件夹里
