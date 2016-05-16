@@ -15,10 +15,12 @@ Including another URLconf
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import url
-from private_haproxy.HaproxyEdit.views import index
+from private_haproxy.HaproxyEdit.views import *
 # from django.contrib import admin
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^$', index, name='templates'),
+    url(r'^backup/', backup, name='backup'),
+    url(r'^restore/', restore, name='restore'),
 ]

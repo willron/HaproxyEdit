@@ -9,22 +9,24 @@ __author__ = 'zxp'
 import time
 import shutil
 import commands
-from django.shortcuts import render,render_to_response
-from django.http import HttpResponse
+from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
 from models import ACL, ACTION, BACKEND_SERVER
 
 
 # 开发环境
-haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
-# haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
+# haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
+haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
 reload_haproxy_cmd = 'ls ~'
 
 # 正式环境
 # haproxycfg_path = '/usr/local/haproxy/etc/haproxy.cfg'
 # reload_haproxy_cmd = '/etc/init.d/haproxy reload'
 
-haproxycfg_stable_front = 'haproxy.cfg.stable.front.txt'        # 公司电脑
+haproxycfg_stable_front = 'haproxy.cfg.stable.front.txt'
 haproxycfg_stable_end = 'haproxy.cfg.stable.end.txt'
+this_path = '/'.join(__file__.split('/')[0:-3])
+
 
 def index(request):
     if request.method == 'GET':
@@ -270,4 +272,31 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
             # print end-start
 
         # return HttpResponse('POST')
+        return render(request, 'result.html')
+
+
+def backup(request):
+    if request.method == 'GET':
+
+        now_time = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
+        shutil.copyfile('db.sqlite3', '{}/backup/db.sqlite3.{}'.format(this_path, now_time))
+        return render(request, 'result.html')
+
+    else:
+        return HttpResponse('DO NOT POST')
+
+
+def restore(request):
+    if request.method == 'GET':
+        import glob
+        all_backup_file = glob.glob('{}/backup/db.sqlite3.*'.format(this_path))
+        if all_backup_file:
+            all_backup_time = [i.split('/')[-1].split('.')[-1] for i in all_backup_file]
+            return render(request, 'restore.html', {'all_backup_time': all_backup_time})
+        else:
+            return HttpResponse('<center><h2>查找不到备份</h2></center>')
+    else:
+        get_backup_time = request.POST['selectbackup']
+        backup_file_name = 'db.sqlite3.' + get_backup_time
+        shutil.copyfile('{}/backup/{}'.format(this_path, backup_file_name), '{}/db.sqlite3'.format(this_path))
         return render(request, 'result.html')

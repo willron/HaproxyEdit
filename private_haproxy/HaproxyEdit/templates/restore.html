@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>备份恢复</title>
+<style>
+body{text-align:center}
+</style>
+</head>
+<body>
+<p><h3>请选择即将恢复的时间点：</h3></p>
+<form method="post">
+    <select id="selectbackup" name="selectbackup" data-placeholder="选择恢复的时间点">
+        {% for eachtime in all_backup_time %}
+            <option value="{{ eachtime }}">{{ eachtime }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="提交" id="selectbackup_submit"/>
+</form>
+</body>
+</html>
