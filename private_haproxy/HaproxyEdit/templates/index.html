@@ -11,7 +11,26 @@
 <body>
 
     <form method="post" id="data_post">
-
+<div>
+    <h4>
+        <p>使用说明：</p>
+        <ul>
+        <li>
+            <p>ACL主要定义访问控制策略（ACL名不可重复）</p>
+            <p>检测方式中，hdr表示检测HTTP请求头信息，hdr(host)表示检测请求头中的host这一项的值，beg表示以XX开始，end表示以XX结束，reg使用正则进行匹配，path表示检测URL的路径</p>
+            <p>hk_test   hdr(host)   hk_test.hk515.com表示如果请求头中的host项值为hk_test.hk515.com，则这条名为hk_test的ACL结果返回真</p>
+        </li>
+        <li>
+            <p>ACTION主要是引用ACL和后端集群，使两者关联起来。不可引用不存在的ACL和BACKEND</p>
+            <p>hk_test_server    hk_test表示如果hk_test这条ACL的结果为真，则使用hk_test_server这个后端集群</p>
+        </li>
+        <li>
+            <p>BACKEND_SERVER用来定义后端集群，目前只开放单个后端服备器</p>
+            <p>需要定义集群名（不可重复），后端服务器名与后端服务器的IP端口。</p>
+        </li>
+        </ul>
+    </h4>
+</div>
         <div>
             <table id="tab" class="tab">
                 <thead  bgcolor="#808080">
