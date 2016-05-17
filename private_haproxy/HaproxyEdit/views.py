@@ -15,8 +15,8 @@ from models import ACL, ACTION, BACKEND_SERVER
 
 
 # 开发环境
-# haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
-haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
+haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
+# haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
 reload_haproxy_cmd = 'ls ~'
 
 # 正式环境
