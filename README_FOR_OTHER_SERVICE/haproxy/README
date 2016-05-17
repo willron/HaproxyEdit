@@ -1,0 +1,51 @@
+在官网下载haproxy后编译安装。项目中采用的haproxy版本为1.5.17。
+
+安装方法如下：
+
+haproxy
+http://www.haproxy.org/download/1.5/src/haproxy-1.5.17.tar.gz
+
+PCRE
+ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
+
+安装依赖
+yum install gcc gcc-c++ make zlib-devel bzip2-devel pcre-devel openssl-devel -y
+
+编译安装PCRE
+tar xvf pcre-8.38.tar.gz
+cd pcre-8.38
+mkdir -p /usr/share/doc/pcre-8.38
+./configure --prefix=/usr --docdir=/usr/share/doc/pcre-8.38 --enable-utf --enable-unicode-properties --enable-pcregrep-libz --enable-pcregrep-libbz2
+make
+make install
+
+编译安装Haproxy
+tar xvf haproxy-1.5.17
+cd haproxy-1.5.17
+make TARGET=linux26 USE_STATIC_PCRE=1 USE_REGPARM=1 USE_LINUX_TPROXY=1 USE_OPENSSL=1 USE_ZLIB=1 ARCH=x86_64 PREFIX=/usr/local/haproxy
+make install PREFIX=/usr/local/haproxy
+
+Haproxy配置文件路径，没有则创建
+/usr/local/haproxy/etc/haproxy/haproxy.cfg
+
+配置文件需要注意的地方
+1. global项中的chroot路径要修改为正确路径
+2. Haproxy默认证书长度为1024。如果是2048的证书。要在global项中添加tune.ssl.default-dh-param 2048，否则启动会报错
+3. defaults项中的contimeout/clitimeout/svrtimeout配置项不再被支持，新名字为timeout connect/timeout client/timeout server
+
+警告信息[WARNING] 217/202150 (2857) : Proxy 'chinaapp.sinaapp.com': in multi-process mode, stats will be limited to process assigned to the current request.的解决方法：
+修改源码文件src/cfgparse.c
+if (nbproc > 1) { if (curproxy->uri_auth) { - Warning("Proxy '%s': in multi-process mode, stats will be limited to process assigned to the current request.\n",##省略部分##
++ Warning("Proxy '%s': in multi-process mode, stats will be limited to the process assigned to the current request.\n",
+调整nbproc的数值即可。我改为4之后重新编译就没再出现警告了。
+
+Haproxy日志记录
+修改/etc/rsyslog.conf文件
+$ModLoad imudp
+$UDPServerRun 514
+local3.* /var/log/haproxy.log
+local1.* /var/log/haproxy.log
+local0.* /var/log/haproxy.log
+然后重启rsyslog服务
+
+haproxy添加系统服务配置文件，记得要加上执行权限

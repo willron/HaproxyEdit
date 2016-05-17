@@ -1,0 +1,7 @@
+named服务，即DNS域名解析服务。
+当客户端所在设备的DNS服务器地址指向它时，named服务能把客户端中的域名(*.hk515.com等)解析到自身服务器上，使项目中的haproxy服务能起作用。
+centos下安装方法：yum install bind -y
+服务启停：
+service named start
+service named stop
+配置方法见同级文件夹对应配置文件

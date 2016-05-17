@@ -1,0 +1,8 @@
+这个的是开机脚本
+要在/etc/rc.d/rc.local添加开机启动项：
+/bin/bash /opt/run.sh
+
+这个脚本是开机做一些初始化工作后启动相关服务的。
+named和haproxy服务均由run.sh脚本启动，所以请关闭系统自动启动服务
+chkconfig named off
+chkconfig haproxy off
