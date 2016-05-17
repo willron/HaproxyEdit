@@ -9,14 +9,15 @@ __author__ = 'zxp'
 import time
 import shutil
 import commands
+import StringIO
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from models import ACL, ACTION, BACKEND_SERVER
 
 
 # 开发环境
-haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
-# haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
+# haproxycfg_path = '/home/zhengxupeng/zxp/haproxy.cfg'       # 公司电脑
+haproxycfg_path = '/home/zxp/haproxy.cfg'       # 家里电脑
 reload_haproxy_cmd = 'ls ~'
 
 # 正式环境
@@ -178,7 +179,8 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
         with open(haproxycfg_path, 'r') as oldcfg:
             oldcfg = oldcfg.read()
 
-        f = open('haproxy.cfg', 'w')
+        # f = open('haproxy.cfg', 'w')
+        f = StringIO.StringIO()
 
         # 文件写入
         with open(haproxycfg_stable_front, 'r') as cfg_stable:
@@ -196,10 +198,12 @@ server  {}_{}  {}  check  inter	1500  rise 3  fall 3  weight 1\n\n"""\
             # 写入文件尾部固定数据
             f.write(cfg_stable.read())
             f.write('\n{}\n\n'.format('#'*80))
-
-        f.close()
-
-        shutil.copyfile('haproxy.cfg', haproxycfg_path)     # 复制新的配置文件到haproxy文件夹里
+        f.seek(0)
+        # print f.read()
+        # f.close()
+        with open(haproxycfg_path, 'w') as oldcfgfile:
+            oldcfgfile.write(f.read())
+        # shutil.copyfile('haproxy.cfg', haproxycfg_path)     # 复制新的配置文件到haproxy文件夹里
         reloadhaproxy = commands.getstatusoutput(reload_haproxy_cmd)
         if reloadhaproxy[0] != 0:
             with open(haproxycfg_path, 'w') as rollback:
